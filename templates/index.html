@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Encryption</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Text Encryption</h1>
+        <textarea id="text" placeholder="Enter text..."></textarea>
+        <select id="method">
+            <option value="AES">AES</option>
+            <option value="DES">DES</option>
+            <option value="RSA">RSA</option>
+        </select>
+        <input type="text" id="key" placeholder="Enter key (AES/DES only)">
+        <button onclick="encryptText()">Encrypt</button>
+        <button onclick="decryptText()">Decrypt</button>
+        <h3>Result:</h3>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        async function encryptText() {
+            const text = document.getElementById("text").value;
+            const method = document.getElementById("method").value;
+            const key = document.getElementById("key").value;
+
+            const response = await fetch('/encrypt', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ text, method, key })
+            });
+            const data = await response.json();
+            document.getElementById("result").innerText = "Encrypted: " + data.encrypted_text;
+        }
+
+        async function decryptText() {
+            const encrypted_text = document.getElementById("result").innerText.replace("Encrypted: ", "");
+            const method = document.getElementById("method").value;
+            const key = document.getElementById("key").value;
+
+            const response = await fetch('/decrypt', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ encrypted_text, method, key })
+            });
+            const data = await response.json();
+            document.getElementById("result").innerText = "Decrypted: " + data.decrypted_text;
+        }
+    </script>
+</body>
+</html>
